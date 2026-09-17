@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface TechnicianRepository extends JpaRepository<Technician, Long> {
 
     Optional<Technician> findByUserId(Long userId);
+
+    long countByStatus(Technician.TechnicianStatus status);
 }
