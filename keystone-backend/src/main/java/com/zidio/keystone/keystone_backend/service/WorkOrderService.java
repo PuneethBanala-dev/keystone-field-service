@@ -9,6 +9,12 @@ import com.zidio.keystone.keystone_backend.repository.TechnicianRepository;
 import com.zidio.keystone.keystone_backend.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.zidio.keystone.keystone_backend.repository.UserRepository;
+import com.zidio.keystone.keystone_backend.repository.WorkOrderLogRepository;
+import com.zidio.keystone.keystone_backend.entity.User;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.zidio.keystone.keystone_backend.entity.WorkOrderLog;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +26,8 @@ public class WorkOrderService {
     private final WorkOrderRepository workOrderRepository;
     private final CustomerRepository customerRepository;
     private final TechnicianRepository technicianRepository;
+    private final WorkOrderLogRepository workOrderLogRepository;
+    private final UserRepository userRepository;
 
     public WorkOrderResponse createWorkOrder(WorkOrderRequest request) {
         Customer customer = customerRepository.findById(request.getCustomerId())
@@ -33,7 +41,8 @@ public class WorkOrderService {
                 .slaDeadline(request.getSlaDeadline())
                 .build();
 
-        workOrderRepository.save(workOrder);
+                workOrderRepository.save(workOrder);
+        logStatusChange(workOrder, WorkOrder.Status.OPEN, "Work order created");
         return toResponse(workOrder);
     }
 
@@ -68,10 +77,11 @@ public class WorkOrderService {
         Technician technician = technicianRepository.findById(request.getTechnicianId())
                 .orElseThrow(() -> new RuntimeException("Technician not found"));
 
-        workOrder.setTechnician(technician);
+                workOrder.setTechnician(technician);
         workOrder.setStatus(WorkOrder.Status.ASSIGNED);
 
         workOrderRepository.save(workOrder);
+        logStatusChange(workOrder, WorkOrder.Status.ASSIGNED, "Technician assigned: " + technician.getUser().getName());
         return toResponse(workOrder);
     }
 
@@ -79,9 +89,24 @@ public class WorkOrderService {
         WorkOrder workOrder = workOrderRepository.findById(workOrderId)
                 .orElseThrow(() -> new RuntimeException("Work order not found"));
 
-        workOrder.setStatus(request.getStatus());
+                workOrder.setStatus(request.getStatus());
         workOrderRepository.save(workOrder);
+        logStatusChange(workOrder, request.getStatus(), "Status updated to " + request.getStatus());
         return toResponse(workOrder);
+    }
+
+    private void logStatusChange(WorkOrder workOrder, WorkOrder.Status status, String note) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email).orElse(null);
+
+        WorkOrderLog log = WorkOrderLog.builder()
+                .workOrder(workOrder)
+                .status(status)
+                .note(note)
+                .changedBy(currentUser)
+                .build();
+
+        workOrderLogRepository.save(log);
     }
 
     private WorkOrderResponse toResponse(WorkOrder workOrder) {
