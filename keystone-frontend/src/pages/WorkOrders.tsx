@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAllWorkOrders } from "../api/workOrderApi";
 import type { WorkOrder } from "../api/workOrderApi";
+import { Link } from "react-router-dom";
 
 export default function WorkOrders() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
@@ -34,7 +35,9 @@ export default function WorkOrders() {
         <tbody>
           {workOrders.map((wo) => (
             <tr key={wo.id} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "10px" }}>{wo.id}</td>
+              <td style={{ padding: "10px" }}>
+  <Link to={`/work-orders/${wo.id}`}>{wo.id}</Link>
+</td>
               <td style={{ padding: "10px" }}>{wo.title}</td>
               <td style={{ padding: "10px" }}>{wo.customerName}</td>
               <td style={{ padding: "10px" }}>{wo.technicianName ?? "Unassigned"}</td>

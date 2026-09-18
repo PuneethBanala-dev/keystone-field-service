@@ -16,6 +16,11 @@ public class WorkOrderController {
 
     private final WorkOrderService workOrderService;
 
+    @GetMapping("/{id}/logs")
+    public ResponseEntity<List<WorkOrderLogResponse>> getLogs(@PathVariable Long id) {
+        return ResponseEntity.ok(workOrderService.getLogsForWorkOrder(id));
+    }
+
     @PostMapping
     public ResponseEntity<WorkOrderResponse> create(@Valid @RequestBody WorkOrderRequest request) {
         return ResponseEntity.ok(workOrderService.createWorkOrder(request));
