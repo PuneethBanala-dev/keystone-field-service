@@ -4,17 +4,46 @@ import Dashboard from "./pages/Dashboard";
 import WorkOrders from "./pages/WorkOrders";
 import WorkOrderDetail from "./pages/WorkOrderDetail";
 import CreateWorkOrder from "./pages/CreateWorkOrder";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/work-orders" element={<WorkOrders />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/work-orders"
+          element={
+            <ProtectedRoute>
+              <WorkOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/work-orders/new"
+          element={
+            <ProtectedRoute>
+              <CreateWorkOrder />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/work-orders/:id"
+          element={
+            <ProtectedRoute>
+              <WorkOrderDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/work-orders/:id" element={<WorkOrderDetail />} />
-        <Route path="/work-orders/new" element={<CreateWorkOrder />} />
       </Routes>
     </BrowserRouter>
   );
