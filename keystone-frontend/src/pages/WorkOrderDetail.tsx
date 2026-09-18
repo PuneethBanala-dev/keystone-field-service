@@ -5,8 +5,10 @@ import {
   getLogs,
   getParts,
   updateStatus,
+  getAllTechnicians,
+  assignTechnician,
 } from "../api/workOrderApi";
-import type { WorkOrder, WorkOrderLog, PartUsed } from "../api/workOrderApi";
+import type { WorkOrder, WorkOrderLog, PartUsed, Technician } from "../api/workOrderApi";
 
 export default function WorkOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +17,7 @@ export default function WorkOrderDetail() {
   const [workOrder, setWorkOrder] = useState<WorkOrder | null>(null);
   const [logs, setLogs] = useState<WorkOrderLog[]>([]);
   const [parts, setParts] = useState<PartUsed[]>([]);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = () => {
@@ -22,11 +25,13 @@ export default function WorkOrderDetail() {
       getWorkOrderById(workOrderId),
       getLogs(workOrderId),
       getParts(workOrderId),
+      getAllTechnicians(),
     ])
-      .then(([woData, logsData, partsData]) => {
+      .then(([woData, logsData, partsData, techData]) => {
         setWorkOrder(woData);
         setLogs(logsData);
         setParts(partsData);
+        setTechnicians(techData);
       })
       .finally(() => setLoading(false));
   };
@@ -34,6 +39,12 @@ export default function WorkOrderDetail() {
   useEffect(() => {
     loadData();
   }, [workOrderId]);
+
+  const handleAssign = async (technicianId: string) => {
+    if (!technicianId) return;
+    await assignTechnician(workOrderId, Number(technicianId));
+    loadData();
+  };
 
   const handleStatusChange = async (newStatus: string) => {
     await updateStatus(workOrderId, newStatus);
@@ -54,6 +65,21 @@ export default function WorkOrderDetail() {
         <strong>Technician:</strong> {workOrder.technicianName ?? "Unassigned"} <br />
         <strong>Priority:</strong> {workOrder.priority} <br />
         <strong>Status:</strong> {workOrder.status}
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Assign Technician: </label>
+        <select
+          value={workOrder.technicianId ?? ""}
+          onChange={(e) => handleAssign(e.target.value)}
+        >
+          <option value="">-- Select Technician --</option>
+          {technicians.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name} ({t.status})
+            </option>
+          ))}
+        </select>
       </div>
 
       <div style={{ marginBottom: "30px" }}>

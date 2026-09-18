@@ -67,3 +67,26 @@ export const createWorkOrder = async (
   const response = await api.post<WorkOrder>("/work-orders", data);
   return response.data;
 };
+export interface Technician {
+  id: number;
+  name: string;
+  email: string;
+  skills: string;
+  status: string;
+}
+
+export const getAllTechnicians = async (): Promise<Technician[]> => {
+  const response = await api.get<Technician[]>("/technicians");
+  return response.data;
+};
+
+export const assignTechnician = async (
+  workOrderId: number,
+  technicianId: number
+): Promise<WorkOrder> => {
+  const response = await api.put<WorkOrder>(
+    `/work-orders/${workOrderId}/assign`,
+    { technicianId }
+  );
+  return response.data;
+};
