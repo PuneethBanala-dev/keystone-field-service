@@ -54,3 +54,16 @@ export const updateStatus = async (id: number, status: string): Promise<WorkOrde
   const response = await api.put<WorkOrder>(`/work-orders/${id}/status`, { status });
   return response.data;
 };
+export interface CreateWorkOrderRequest {
+  title: string;
+  description: string;
+  customerId: number;
+  priority: string;
+}
+
+export const createWorkOrder = async (
+  data: CreateWorkOrderRequest
+): Promise<WorkOrder> => {
+  const response = await api.post<WorkOrder>("/work-orders", data);
+  return response.data;
+};

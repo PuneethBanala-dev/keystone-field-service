@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import WorkOrders from "./pages/WorkOrders";
 import WorkOrderDetail from "./pages/WorkOrderDetail";
+import CreateWorkOrder from "./pages/CreateWorkOrder";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/work-orders" element={<WorkOrders />} />
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/work-orders/:id" element={<WorkOrderDetail />} />
+        <Route path="/work-orders/new" element={<CreateWorkOrder />} />
       </Routes>
     </BrowserRouter>
   );

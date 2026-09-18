@@ -21,6 +21,8 @@ export default function WorkOrders() {
   return (
     <div style={{ padding: "40px" }}>
       <h1>Work Orders</h1>
+<Link to="/work-orders/new">+ Create New Work Order</Link>
+<br /><br />
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
         <thead>
           <tr style={{ textAlign: "left", borderBottom: "2px solid #ccc" }}>
