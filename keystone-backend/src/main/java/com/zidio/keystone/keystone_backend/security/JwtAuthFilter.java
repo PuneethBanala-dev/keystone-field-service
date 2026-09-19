@@ -35,7 +35,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
-        final String email = jwtUtil.extractEmail(token);
+        String email = null;
+
+        try {
+            email = jwtUtil.extractEmail(token);
+        } catch (Exception e) {
+            // Invalid or expired token — just skip authentication, let the request continue
+            // (permitAll endpoints will still work; protected ones will correctly reject as
+            // unauthenticated)
+        }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);

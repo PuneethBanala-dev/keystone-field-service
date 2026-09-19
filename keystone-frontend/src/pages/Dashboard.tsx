@@ -1,82 +1,55 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Layout from "../components/Layout";
 import { getDashboardSummary } from "../api/dashboardApi";
 import type { DashboardSummary } from "../api/dashboardApi";
 
 export default function Dashboard() {
   const name = localStorage.getItem("name");
-  const navigate = useNavigate();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
 
   useEffect(() => {
     getDashboardSummary().then(setSummary);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
-  const cardStyle = {
-    border: "1px solid #444",
-    borderRadius: "8px",
-    padding: "20px",
-    minWidth: "150px",
-    textAlign: "center" as const,
-  };
-
   return (
-    <div style={{ padding: "40px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Welcome, {name}</h1>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-
-      <Link to="/work-orders">View Work Orders</Link>
+    <Layout>
+      <h1>Welcome, {name}</h1>
+      <p>Here's what's happening across your field operations.</p>
 
       {summary && (
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            flexWrap: "wrap",
-            marginTop: "30px",
-          }}
-        >
-          <div style={cardStyle}>
-            <h2>{summary.totalWorkOrders}</h2>
-            <p>Total Work Orders</p>
+        <div className="stat-grid">
+          <div className="stat-card">
+            <div className="stat-number mono">{summary.totalWorkOrders}</div>
+            <div className="stat-label">Total Work Orders</div>
           </div>
-          <div style={cardStyle}>
-            <h2>{summary.openCount}</h2>
-            <p>Open</p>
+          <div className="stat-card">
+            <div className="stat-number mono">{summary.openCount}</div>
+            <div className="stat-label">Open</div>
           </div>
-          <div style={cardStyle}>
-            <h2>{summary.assignedCount}</h2>
-            <p>Assigned</p>
+          <div className="stat-card">
+            <div className="stat-number mono">{summary.assignedCount}</div>
+            <div className="stat-label">Assigned</div>
           </div>
-          <div style={cardStyle}>
-            <h2>{summary.inProgressCount}</h2>
-            <p>In Progress</p>
+          <div className="stat-card">
+            <div className="stat-number mono">{summary.inProgressCount}</div>
+            <div className="stat-label">In Progress</div>
           </div>
-          <div style={cardStyle}>
-            <h2>{summary.completedCount}</h2>
-            <p>Completed</p>
+          <div className="stat-card">
+            <div className="stat-number mono">{summary.completedCount}</div>
+            <div className="stat-label">Completed</div>
           </div>
-          <div style={{ ...cardStyle, borderColor: summary.slaBreachedCount > 0 ? "red" : "#444" }}>
-            <h2 style={{ color: summary.slaBreachedCount > 0 ? "red" : "inherit" }}>
-              {summary.slaBreachedCount}
-            </h2>
-            <p>SLA Breached</p>
+          <div className={`stat-card ${summary.slaBreachedCount > 0 ? "danger" : ""}`}>
+            <div className="stat-number mono">{summary.slaBreachedCount}</div>
+            <div className="stat-label">SLA Breached</div>
           </div>
-          <div style={cardStyle}>
-            <h2>
+          <div className="stat-card">
+            <div className="stat-number mono">
               {summary.availableTechnicians}/{summary.totalTechnicians}
-            </h2>
-            <p>Technicians Available</p>
+            </div>
+            <div className="stat-label">Technicians Available</div>
           </div>
         </div>
       )}
-    </div>
+    </Layout>
   );
 }
